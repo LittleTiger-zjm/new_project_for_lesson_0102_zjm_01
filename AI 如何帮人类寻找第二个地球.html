@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 如何帮人类寻找"第二个地球" · 系外行星发现中的智能革命</title>
+<meta name="description" content="面向高中生的调研报告网站：系外行星探测方法原理、AI 解决的痛点、ExoMiner 与 Kepler-90i 等代表案例、公开数据集与工具、当前挑战与未来趋势。">
+<style>
+/* SECTION: base */
+:root{
+  --ink:#15202f;
+  --ink-soft:#3d4d63;
+  --ink-mute:#6b7d95;
+  --line:#dde5ef;
+  --bg:#f5f8fc;
+  --card:#ffffff;
+  --accent:#2f5fd0;
+  --accent-soft:#eaf1fd;
+  --deep:#0b1430;
+  --deep-2:#152a5c;
+  --gold:#c88a2b;
+  --teal:#1f8a7a;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(21,32,47,.05),0 8px 24px rgba(21,32,47,.06);
+  --maxw:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  font-size:16px;
+  line-height:1.85;
+  -webkit-text-size-adjust:100%;
+}
+h1,h2,h3,h4{line-height:1.35;margin:0 0 .6em;font-weight:700;letter-spacing:.01em}
+p{margin:0 0 1.15em}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:var(--ink)}
+small{font-size:.9em}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* SECTION: header nav */
+.site-header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.94);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:saturate(180%) blur(8px);
+}
+.header-inner{
+  max-width:var(--maxw);margin:0 auto;padding:10px 24px;
+  display:flex;align-items:center;gap:18px;
+}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--ink);white-space:nowrap;font-size:15px}
+.brand .logo{
+  width:30px;height:30px;flex:0 0 30px;border-radius:50%;
+  background:radial-gradient(circle at 32% 30%,#5f8cf0 0%,#22346b 62%,#0b1430 100%);
+  box-shadow:0 0 0 3px rgba(47,95,208,.12);
+}
+.nav{
+  display:flex;gap:4px;margin-left:auto;overflow-x:auto;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.nav::-webkit-scrollbar{display:none}
+.nav a{
+  display:block;padding:7px 13px;border-radius:999px;
+  color:var(--ink-soft);font-size:14.5px;font-weight:600;white-space:nowrap;
+}
+.nav a:hover{background:var(--accent-soft);color:var(--accent);text-decoration:none}
+
+/* SECTION: hero */
+.hero{
+  position:relative;overflow:hidden;color:#eaf0ff;
+  background:linear-gradient(160deg,var(--deep) 0%,var(--deep-2) 55%,#1d2f66 100%);
+}
+.hero::before,.hero::after{
+  content:"";position:absolute;inset:-10%;pointer-events:none;
+  background-image:
+    radial-gradient(1.6px 1.6px at 12% 22%,rgba(255,255,255,.85) 50%,transparent 51%),
+    radial-gradient(1.2px 1.2px at 28% 71%,rgba(255,255,255,.7) 50%,transparent 51%),
+    radial-gradient(1.8px 1.8px at 46% 34%,rgba(255,255,255,.8) 50%,transparent 51%),
+    radial-gradient(1.1px 1.1px at 63% 78%,rgba(255,255,255,.65) 50%,transparent 51%),
+    radial-gradient(1.5px 1.5px at 78% 26%,rgba(255,255,255,.8) 50%,transparent 51%),
+    radial-gradient(1.2px 1.2px at 88% 62%,rgba(255,255,255,.6) 50%,transparent 51%),
+    radial-gradient(1px 1px at 68% 12%,rgba(255,255,255,.55) 50%,transparent 51%),
+    radial-gradient(1px 1px at 18% 46%,rgba(255,255,255,.5) 50%,transparent 51%);
+  opacity:.85;
+}
+.hero::after{
+  background:radial-gradient(520px 300px at 82% 16%,rgba(96,140,240,.28),transparent 70%);
+}
+.hero-inner{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:72px 24px 56px}
+.eyebrow{
+  display:inline-block;padding:5px 13px;border-radius:999px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  font-size:13px;letter-spacing:.06em;color:#cfe0ff;margin-bottom:20px;
+}
+.hero h1{font-size:clamp(30px,5vw,50px);color:#fff;margin-bottom:16px}
+.hero h1 .hl{color:#8fb4ff}
+.lede{
+  font-size:clamp(16px,2.1vw,19px);color:#c9d6f2;max-width:820px;margin-bottom:30px;
+}
+.lede em{color:#ffd68a;font-style:normal;font-weight:600}
+.stat-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.stat{
+  min-width:150px;flex:1 1 150px;padding:14px 16px;border-radius:12px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);
+}
+.stat b{display:block;font-size:22px;color:#fff;line-height:1.3}
+.stat span{font-size:13px;color:#a9bde3}
+.hero-note{font-size:13.5px;color:#93a9d4;margin:0}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.hero-tags span{
+  font-size:13px;padding:4px 11px;border-radius:999px;
+  background:rgba(143,180,255,.14);color:#cfe0ff;border:1px solid rgba(143,180,255,.24);
+}
+
+/* SECTION: sections */
+main{display:block}
+.section{padding:64px 0 8px}
+.section[id]{scroll-margin-top:72px}
+.section-head{margin-bottom:30px}
+.kicker{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--accent);
+  text-transform:uppercase;margin-bottom:10px;
+}
+.section h2{font-size:clamp(24px,3.4vw,33px)}
+.section h2 .num{color:var(--ink-mute);font-weight:600;font-size:.62em;margin-right:10px}
+.section .sub{color:var(--ink-soft);max-width:840px;font-size:16.5px}
+.section:target .section-head{animation:flash 1.6s ease-out}
+.section:target .section-head h2{color:var(--accent)}
+@keyframes flash{
+  0%{background:var(--accent-soft);box-shadow:0 0 0 8px var(--accent-soft)}
+  100%{background:transparent;box-shadow:0 0 0 8px transparent}
+}
+.section .section-head{padding:2px 8px;margin-left:-8px;border-radius:10px}
+.section h3{font-size:19px;margin-top:34px;display:flex;align-items:center;gap:9px}
+.section h3 .ico{font-size:20px;line-height:1}
+.section h4{font-size:16.5px;margin-top:22px;color:var(--ink)}
+.lead-quote{
+  border-left:3px solid var(--accent);background:var(--card);
+  padding:16px 20px;border-radius:0 var(--radius) var(--radius) 0;
+  box-shadow:var(--shadow);color:var(--ink-soft);margin:0 0 26px;font-size:16px;
+}
+.lead-quote p:last-child{margin:0}
+.callout{
+  background:var(--accent-soft);border:1px solid #cfe0fb;border-radius:var(--radius);
+  padding:18px 20px;margin:22px 0;font-size:15.5px;color:var(--ink-soft);
+}
+.callout b{color:var(--accent)}
+.callout p:last-child{margin:0}
+
+/* SECTION: cards */
+.grid{display:grid;gap:18px;margin:22px 0}
+.grid.c2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.grid.c3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 22px;box-shadow:var(--shadow);
+}
+.card:hover{border-color:#c3d5f2}
+.card .card-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.card .badge{
+  width:34px;height:34px;flex:0 0 34px;border-radius:9px;display:grid;place-items:center;
+  font-size:18px;background:var(--accent-soft);
+}
+.card h4{margin:0;font-size:17px}
+.card p{font-size:15px;color:var(--ink-soft);margin:0 0 .7em}
+.card p:last-child{margin-bottom:0}
+.card .kv{display:block;font-size:14.5px;color:var(--ink-mute);margin-top:10px}
+.card .kv b{color:var(--ink);font-weight:600}
+.tag-list{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 0}
+.tag-list span{
+  font-size:12.5px;padding:3px 10px;border-radius:999px;
+  background:#f1f5fb;border:1px solid var(--line);color:var(--ink-soft);
+}
+.metric-row{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}
+.metric{
+  flex:1 1 160px;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);
+}
+.metric b{display:block;font-size:21px;color:var(--accent);line-height:1.35}
+.metric span{font-size:13.5px;color:var(--ink-mute)}
+.case{
+  background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+  border-radius:var(--radius);padding:22px 24px;margin:20px 0;box-shadow:var(--shadow);
+}
+.case.cn{border-left-color:var(--gold)}
+.case.goog{border-left-color:var(--teal)}
+.case-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:12px}
+.case-head h3{margin:0;font-size:20px}
+.case-head .year{
+  font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px;
+  background:#f1f5fb;color:var(--ink-mute);border:1px solid var(--line);
+}
+.case p{font-size:15.5px;color:var(--ink-soft)}
+.case p:last-child{margin-bottom:0}
+
+/* SECTION: diagram */
+figure.diagram{
+  margin:26px 0;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);
+}
+figure.diagram svg{display:block;width:100%;height:auto;max-width:760px;margin:0 auto}
+figcaption{
+  font-size:13.5px;color:var(--ink-mute);margin-top:14px;text-align:center;line-height:1.7;
+}
+.curve{font-variant-numeric:tabular-nums}
+
+/* SECTION: tables */
+.table-wrap{
+  overflow-x:auto;margin:22px 0;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+}
+table.data{width:100%;border-collapse:collapse;font-size:14.5px;min-width:640px}
+table.data caption{
+  caption-side:top;text-align:left;padding:15px 18px 12px;
+  font-weight:700;font-size:15px;color:var(--ink);border-bottom:1px solid var(--line);
+}
+table.data th,table.data td{
+  padding:12px 16px;text-align:left;vertical-align:top;border-bottom:1px solid #edf1f7;
+}
+table.data thead th{background:#f1f5fb;color:var(--ink);font-size:13.5px;font-weight:700;white-space:nowrap}
+table.data td{color:var(--ink-soft)}
+table.data td:first-child{color:var(--ink);font-weight:600}
+table.data tbody tr:last-child td{border-bottom:none}
+table.data tbody tr:hover{background:#fafcff}
+code{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  font-size:.92em;background:#eef2f8;padding:2px 6px;border-radius:5px;color:#26405f;
+}
+
+/* SECTION: lists */
+.num-list{list-style:none;counter-reset:n;margin:22px 0;padding:0}
+.num-list li{
+  counter-increment:n;position:relative;padding:14px 18px 14px 52px;margin-bottom:12px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+  font-size:15.5px;color:var(--ink-soft);
+}
+.num-list li::before{
+  content:counter(n);position:absolute;left:16px;top:14px;
+  width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  font-weight:700;font-size:14px;display:grid;place-items:center;
+}
+.num-list li b{color:var(--ink)}
+.plain{list-style:none;margin:16px 0;padding:0}
+.plain li{position:relative;padding-left:22px;margin-bottom:9px;color:var(--ink-soft);font-size:15.5px}
+.plain li::before{content:"▸";position:absolute;left:4px;color:var(--accent)}
+.flow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:20px 0}
+.flow .step{
+  flex:1 1 190px;background:var(--card);border:1px solid var(--line);border-radius:11px;
+  padding:13px 15px;font-size:14.5px;color:var(--ink-soft);box-shadow:var(--shadow);
+}
+.flow .step b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+.flow .arrow{color:var(--ink-mute);font-size:18px;flex:0 0 auto}
+
+/* SECTION: footer refs */
+.refs{
+  margin-top:70px;background:var(--deep);color:#c3d2f0;padding:52px 0 34px;
+  border-radius:24px 24px 0 0;
+}
+.refs h2{color:#fff;font-size:24px;margin-bottom:8px}
+.refs .ref-note{font-size:14px;color:#8fa3cd;max-width:760px;margin-bottom:26px}
+.ref-group{margin-bottom:26px}
+.ref-group h3{
+  color:#9dc0ff;font-size:15px;letter-spacing:.04em;margin:0 0 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.ref-list{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.ref-list li{font-size:14.5px;line-height:1.7;color:#a8bade;padding-left:2px}
+.ref-list li .t{color:#e6eeff;font-weight:600}
+.ref-list a{color:#8fb4ff;word-break:break-all}
+.ref-list a:hover{color:#c6dbff}
+.colophon{
+  border-top:1px solid rgba(255,255,255,.14);margin-top:12px;padding-top:20px;
+  font-size:13.5px;color:#8093ba;
+}
+.colophon p{margin:0 0 .5em}
+
+/* SECTION: responsive */
+@media (max-width:900px){
+  .header-inner{flex-wrap:wrap;gap:8px}
+  .nav{width:100%;margin-left:0;padding-bottom:2px}
+  .hero-inner{padding:52px 20px 44px}
+  .section{padding:50px 0 4px}
+  .wrap{padding:0 20px}
+}
+@media (max-width:600px){
+  body{font-size:15.5px}
+  .stat,.metric,.flow .step,.card,.case,.num-list li{font-size:14.5px}
+  .case,.card{padding:18px 18px}
+  figure.diagram{padding:16px 12px}
+  .brand{font-size:14px}
+  .nav a{padding:6px 11px;font-size:13.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- SECTION: header -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand"><span class="logo" aria-hidden="true"></span>AI 寻找系外行星</div>
+    <nav class="nav" aria-label="页面导航">
+      <a href="#background">背景</a>
+      <a href="#ai-role">AI的作用</a>
+      <a href="#cases">代表案例</a>
+      <a href="#datasets">数据集</a>
+      <a href="#challenges">挑战与展望</a>
+      <a href="#refs">参考资料</a>
+    </nav>
+  </div>
+</header>
+
+<!-- SECTION: hero -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <span class="eyebrow">🛰️ AI 实验课调研成果 · 高中生通俗版</span>
+    <h1>AI 如何帮人类寻找<span class="hl">"第二个地球"</span></h1>
+    <p class="lede">系外行星自己不发光，人类只能靠它在恒星身上留下的"痕迹"来判断它的存在；而今天，是<em>人工智能</em>在数百万条亮度曲线里，替人类把这些痕迹一条条挑出来。</p>
+    <div class="stat-row">
+      <div class="stat"><b>4383+</b><span>凌星法已发现的行星数</span></div>
+      <div class="stat"><b>7658</b><span>TESS 档案兴趣目标（TOI）</span></div>
+      <div class="stat"><b>666</b><span>其中被确认的真行星</span></div>
+      <div class="stat"><b>301</b><span>ExoMiner 验证的新行星</span></div>
+    </div>
+    <div class="hero-tags">
+      <span>🔭 凌星法</span><span>🌊 径向速度法</span><span>🧠 深度学习</span><span>📦 Kepler / TESS 公开数据</span><span>🇨🇳 中科院进展</span>
+    </div>
+    <p class="hero-note">页面数据均来自文末所列论文与新闻来源 · 报告完成于 2026 年 10 月</p>
+  </div>
+</section>
+
+<main>
+
+<!-- SECTION: background -->
+<section class="section wrap" id="background">
+  <div class="section-head">
+    <span class="kicker">01 · Background</span>
+    <h2><span class="num">一</span>物理背景：人类怎样找到不发光的世界</h2>
+    <p class="sub">系外行星本身不发光，又离地球极远，直接"拍清楚"它相当于在几公里外的探照灯旁边找一只萤火虫。科学家的思路是：不看行星本身，而是看它对宿主恒星造成的细微影响，再反推它的存在。</p>
+  </div>
+
+  <div class="lead-quote">
+    <p>🔦 <strong>一句话抓住本质</strong>：行星不发光，所以我们测的是"恒星被行星影响后发生了多小的变化"——亮度掉一点点、光谱偏一点点、光线被引力放大一点点。这些变化的幅度小到必须用精密仪器和算法才能发现。</p>
+  </div>
+
+  <h3><span class="ico">🪐</span>四种主流探测方法</h3>
+  <div class="grid c2">
+    <div class="card">
+      <div class="card-top"><span class="badge">🌘</span><h4>凌星法 Transit</h4></div>
+      <p>行星运行到恒星和地球之间，遮住一小片光，恒星亮度出现<strong>周期性、幅度微小的下降</strong>，像一次微型日食。开普勒与 TESS 都主要靠它。</p>
+      <p>亮度下降多少能算出<strong>行星半径</strong>；多久降一次能算出<strong>公转周期与轨道半径</strong>；配合光谱还能推断<strong>大气成分</strong>。</p>
+      <span class="kv"><b>局限：</b>轨道面必须几乎正对视线，类太阳恒星周围的类地行星被看到的概率只有约 <strong>0.5%</strong>；木星大小让亮度降约 1%，地球大小只降约 <strong>0.01%</strong>。</span>
+      <div class="tag-list"><span>发现数量第一</span><span>已发现 4383+ 颗</span><span>光变曲线是主数据</span></div>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge">🌊</span><h4>径向速度法 Radial Velocity</h4></div>
+      <p>行星和恒星绕共同质心转，行星引力把恒星"带得晃起来"。恒星朝地球来，光谱<strong>蓝移</strong>；远离就<strong>红移</strong>——多普勒效应。它让人类第一次在类太阳恒星周围找到系外行星。</p>
+      <p>测频移幅度能推算<strong>行星质量下限</strong>和<strong>轨道参数</strong>。</p>
+      <span class="kv"><b>局限：</b>不需要轨道对齐，适用范围更广，但小质量行星极难测——地球只让太阳产生 <strong>每秒 9 厘米</strong>的速度变化，而高精度光谱仪的精度约为<strong>每秒几十厘米</strong>。</span>
+      <div class="tag-list"><span>发现数量第二</span><span>已发现 1100+ 颗</span><span>给出质量信息</span></div>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge">📷</span><h4>直接成像法 Direct Imaging</h4></div>
+      <p>用日冕仪一类设备挡住宿主恒星的强光，直接拍下行星的微弱影像。</p>
+      <span class="kv"><b>适用：</b>大质量、年轻、自身热辐射强、离恒星较远的行星。能直接给出行星大小、温度和大气成分，是未来研究系外行星大气、寻找生命迹象的核心手段。</span>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge">🔍</span><h4>微引力透镜法 Microlensing</h4></div>
+      <p>依据广义相对论：前景恒星经过背景恒星前方时，其引力像透镜一样放大背景星光；如果前景恒星带有行星，行星引力会产生额外信号，让光变曲线冒出一个小峰值。</p>
+      <span class="kv"><b>优势：</b>能看到几千光年外、质量很小、离宿主恒星很远的行星——这些目标其他方法难以触及。</span>
+    </div>
+  </div>
+
+  <figure class="diagram">
+    <svg viewBox="0 0 760 300" role="img" aria-label="凌星法原理与光变曲线示意图">
+      <defs>
+        <radialGradient id="star" cx="38%" cy="35%">
+          <stop offset="0%" stop-color="#ffe9a8"/><stop offset="55%" stop-color="#f5b62e"/><stop offset="100%" stop-color="#c8791a"/>
+        </radialGradient>
+      </defs>
+      <text x="24" y="30" font-size="15" fill="#15202f" font-weight="700">① 行星挡住一点点星光</text>
+      <circle cx="130" cy="110" r="54" fill="url(#star)"/>
+      <circle cx="140" cy="98" r="13" fill="#1d2635"/>
+      <path d="M60 110 h-26 M200 110 h30" stroke="#9fb0c6" stroke-width="2" stroke-dasharray="5 5"/>
+      <text x="250" y="100" font-size="13" fill="#3d4d63">地球方向</text>
+      <text x="250" y="122" font-size="12.5" fill="#6b7d95">行星越小、遮挡比例越小，亮度下降越微弱</text>
+      <text x="400" y="30" font-size="15" fill="#15202f" font-weight="700">② 我们看到的亮度曲线</text>
+      <line x1="400" y1="230" x2="736" y2="230" stroke="#c8d3e2" stroke-width="1.5"/>
+      <line x1="400" y1="52" x2="400" y2="230" stroke="#c8d3e2" stroke-width="1.5"/>
+      <polyline class="curve" fill="none" stroke="#2f5fd0" stroke-width="3" stroke-linejoin="round"
+        points="400,86 470,86 486,86 502,166 528,166 544,86 614,86 630,86 646,166 672,166 688,86 736,86"/>
+      <text x="404" y="72" font-size="12" fill="#6b7d95">亮度</text>
+      <text x="690" y="252" font-size="12" fill="#6b7d95">时间 →</text>
+      <text x="512" y="200" font-size="12" fill="#3d4d63">每次凌星＝一个小坑</text>
+      <text x="404" y="278" font-size="12.5" fill="#6b7d95">坑的深度 → 行星半径；两个坑的间隔 → 公转周期</text>
+    </svg>
+    <figcaption>凌星法的原理（上）与它在数据里留下的形状（下）。开普勒和 TESS 传回的就是这种"亮度—时间"曲线，学名叫<strong>光变曲线</strong>。</figcaption>
+  </figure>
+
+  <div class="table-wrap">
+    <table class="data">
+      <caption>表 1 · 四种主流探测方法对比</caption>
+      <thead><tr><th>方法</th><th>原理</th><th>可获取的信息</th><th>适用对象与限制</th></tr></thead>
+      <tbody>
+        <tr><td>凌星法</td><td>行星遮挡恒星造成周期性微小亮度下降</td><td>行星半径、公转周期、轨道半径，结合光谱可推断大气成分</td><td>已发现超过 4383 颗；类地行星被观测到的概率仅约 0.5%，需分辨约 0.01% 的亮度下降</td></tr>
+        <tr><td>径向速度法</td><td>行星引力拖动恒星摆动，光谱出现蓝移与红移</td><td>行星质量下限与轨道参数</td><td>已发现超过 1100 颗；地球仅让太阳产生每秒 9 厘米速度变化，仪器精度约每秒几十厘米</td></tr>
+        <tr><td>直接成像法</td><td>用日冕仪遮挡恒星强光后直接拍摄行星影像</td><td>行星大小、温度、大气成分</td><td>适用于大质量、年轻、热辐射强、离恒星远的行星</td></tr>
+        <tr><td>微引力透镜法</td><td>前景恒星引力放大背景星光，行星产生额外峰值</td><td>光变曲线上的微透镜信号峰值</td><td>可探测几千光年外、质量小、离宿主恒星远的行星</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3><span class="ico">⏱️</span>第五种技巧：凌星中间时刻变化法（TTV）</h3>
+  <p>这是凌星法的一个精妙延伸。同一个恒星系统里有多颗行星时，它们会互相引力拉扯，那颗"会挡光"的行星每次凌星的<strong>时间就会提前或延后一点点</strong>。把偏差精确测出来，就能反推出系统里另一颗看不见、不挡光的行星的质量和轨道。</p>
+  <p>它的独特价值在于同时绕开两道门槛：<strong>不需要隐藏行星的轨道面正对地球，也不需要测视向速度</strong>，因此特别适合找非凌星的宜居带行星。理解这一点，就能理解第三部分中国团队 2025 年那颗"超级地球"是怎么被确认的。</p>
+</section>
+
+<!-- SECTION: ai-role -->
+<section class="section wrap" id="ai-role">
+  <div class="section-head">
+    <span class="kicker">02 · Where AI Steps In</span>
+    <h2><span class="num">二</span>AI 的作用：从"大海捞针"到毫秒级分诊</h2>
+    <p class="sub">开普勒和 TESS 把天文学推进了数据爆炸时代，卡脖子的不再是"看不到"，而是"筛不过来"。AI 进入这个领域，最直接的动机就是替代不可能完成的人工审查。</p>
+  </div>
+
+  <div class="metric-row">
+    <div class="metric"><b>7658</b><span>TESS 兴趣目标（TOI）总数</span></div>
+    <div class="metric"><b>5152</b><span>仍只是候选体，未确认</span></div>
+    <div class="metric"><b>666</b><span>最终被确认为真行星</span></div>
+    <div class="metric"><b>1185</b><span>被判定为假阳性</span></div>
+  </div>
+  <p>换句话说，机器标记出来的信号里，<strong>绝大多数并不是行星</strong>，假阳性数量甚至超过了确认行星的数量。</p>
+
+  <h3><span class="ico">🧮</span>人工审查为什么撑不住</h3>
+  <p>过去靠天文学家逐个看报告，或用 Robovetter 这类基于规则的打分系统，但这些都受限于人的精力和主观偏差。普林斯顿大学团队做过估算：</p>
+  <div class="flow">
+    <div class="step"><b>约 3 年半</b>纯人工筛完 8000 万条 TESS 光变曲线的估计耗时</div>
+    <span class="arrow">→</span>
+    <div class="step"><b>约 250 万条</b>AI 预筛后留给后续流程的数据量</div>
+    <span class="arrow">→</span>
+    <div class="step"><b>毫秒级</b>单个候选体的处理速度，可实现大规模实时分诊</div>
+  </div>
+  <p>原本需要数周的人工筛查被压缩到几分钟甚至几毫秒——这就是 AI 在这个领域的第一价值。</p>
+
+  <h3><span class="ico">🎯</span>AI 具体解决了四个痛点</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <caption>表 2 · AI 解决的四个核心痛点及量化效果</caption>
+      <thead><tr><th>痛点环节</th><th>传统做法的瓶颈</th><th>AI 的做法</th><th>量化效果</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>海量光变曲线自动筛选</td>
+          <td>人工与规则系统受专家精力与主观偏差限制</td>
+          <td>模型先做大规模预筛，再交给后续流程</td>
+          <td>原本约 3 年半的 8000 万条数据被压缩至约 250 万条</td>
+        </tr>
+        <tr>
+          <td>真假信号分类与误报剔除</td>
+          <td>只用单一类型数据（如仅流量曲线）难以区分复杂假阳性</td>
+          <td>融合流量、质心运动、二次食、奇偶食深度差异、恒星参数等多维诊断信息</td>
+          <td>RAVEN 流程在所有假阳性情景下 AUC 均超过 97%，外部测试集总体准确率 91%</td>
+        </tr>
+        <tr>
+          <td>微弱信号提取与增强</td>
+          <td>低信噪比信号被传统算法的阈值过滤掉</td>
+          <td>GPU 并行相位折叠增强信号，再由卷积神经网络识别模式</td>
+          <td>GPFC 比国际流行的 BLS 法搜寻速度提高约 15 倍，检测准确度与完备度各提高约 7%</td>
+        </tr>
+        <tr>
+          <td>从被动验证到主动发现</td>
+          <td>早期 AI 只验证别人给出的候选信号</td>
+          <td>新一代模型直接从原始数据识别信号，并预测未知行星</td>
+          <td>Bern 大学 AI 模型预测整个行星系统形成，比传统数值模拟快百万倍</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid c2">
+    <div class="card">
+      <div class="card-top"><span class="badge">🧩</span><h4>为什么要"多维信息"一起喂给模型</h4></div>
+      <p>行星信号很容易和<strong>食双星</strong>（两颗互相遮挡的恒星）、<strong>背景食双星</strong>、<strong>恒星活动噪声</strong>混淆。只看亮度曲线，这几种情况长得几乎一样。把质心运动、二次食、奇偶食深度差异、恒星参数一起交给模型，等于把专家逐项核对报告的逻辑复制给了 AI，准确率因此明显提高。</p>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge">🔬</span><h4>为什么"微弱信号"值得专门处理</h4></div>
+      <p>小质量长周期行星、超短周期行星的信号信噪比极低，常在阈值筛选阶段就被当成噪声丢掉。<strong>相位折叠</strong>（把不同周期的观测叠在一起反复平均）能把一点点信号"攒"出来，再交给卷积神经网络识别形状，就能从看似噪声的数据里挖出被遗漏的行星。</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION: cases -->
+<section class="section wrap" id="cases">
+  <div class="section-head">
+    <span class="kicker">03 · Landmark Results</span>
+    <h2><span class="num">三</span>代表案例：AI 改写行星目录的三次标志性胜利</h2>
+    <p class="sub">三组成果分别说明三件事：AI 可以比人更会分类、可以在人已经翻过的数据里捡到漏网之鱼、可以在算法效率上做出原创突破。</p>
+  </div>
+
+  <article class="case">
+    <div class="case-head"><h3>🛰️ NASA ExoMiner：把专家的审查逻辑写进网络结构</h3><span class="year">2021 起 · NASA 艾姆斯研究中心</span></div>
+    <p>ExoMiner 是一个<strong>开源的深度学习分类器</strong>，它的核心创新不是数据更大，而是<strong>模仿天文学家审查诊断报告（DV Report）的思维过程</strong>，而不是把原始像素直接塞进网络。</p>
+    <p>架构上，它包含多个卷积分支，分别处理全轨道视图与凌星视图的流量、质心运动、二次食、奇偶食时间序列，再由全连接层融合恒星参数、bootstrap-pfa 这类标量诊断值。最巧妙的是<strong>减法层</strong>——权重被固定为 1 和 −1，专门用来比较奇食与偶食的深度差异，而这正是专家判断"这是食双星假阳性"的核心依据。输入尺寸也做过优化：全轨道视图取 301 个 bin，凌星视图取 31 个 bin，让信号表示更平滑。</p>
+    <p>深度学习长期被指为"黑箱"。ExoMiner 为此引入遮挡敏感性映射、噪声敏感性映射和 Grad-CAM 框架，能生成热力图告诉专家"模型凭什么认为这是行星"，从而让科学界敢用它的结论。</p>
+    <div class="metric-row">
+      <div class="metric"><b>99% / 93.6%</b><span>精确率条件下的召回率，基线模型 GPC 仅 76.3%</span></div>
+      <div class="metric"><b>前 975 名</b><span>排名最靠前的候选体中零假阳性</span></div>
+      <div class="metric"><b>301 颗</b><span>已从开普勒档案验证的新系外行星</span></div>
+      <div class="metric"><b>7,330</b><span>ExoMiner++ 在 147,568 个未标记 TESS 候选信号中挑出的候选体</span></div>
+    </div>
+    <p>升级版 <strong>ExoMiner++</strong> 用迁移学习把在开普勒数据上训练好的模型用到 TESS 数据上，代码已在 GitHub 开源。</p>
+  </article>
+
+  <article class="case goog">
+    <div class="case-head"><h3>🤖 Google AI 与 Kepler-90i：神经网络揪出"漏网之鱼"</h3><span class="year">2017.12 宣布 · 2018 开源</span></div>
+    <p>2017 年 12 月，NASA 与 Google 联合宣布用机器学习发现了 <strong>Kepler-90 系统的第 8 颗行星 Kepler-90i</strong>，让这个系统成为第一个和太阳系一样拥有 8 颗已知行星的恒星系统。</p>
+    <p>故事起点是 Google 高级软件工程师 Christopher Shallue 提出用神经网络分析开普勒数据。他与德州大学奥斯汀分校天体物理学家 Andrew Vanderburg 合作，用<strong>超过 15,000 个已标注的开普勒信号</strong>训练了一个 TensorFlow 模型，让它学会区分行星信号与非行星信号，测试准确率 <strong>96%</strong>。</p>
+    <p>真正体现研究智慧的是搜索策略：他们不漫无目的地扫描全部数据，而是把模型<strong>定向用于 670 个已知多行星系统</strong>——因为这些系统最可能还藏着更多行星。结果不仅找到了 Kepler-90i，还顺带发现了 Kepler-80 系统的第 6 颗行星 <strong>Kepler-80g</strong>。</p>
+    <div class="grid c2">
+      <div class="card">
+        <div class="card-top"><span class="badge">🌋</span><h4>Kepler-90i 是什么样的世界</h4></div>
+        <p>岩石行星，半径为地球的 <strong>1.3 倍</strong>，公转周期仅 <strong>14.4 天</strong>，表面温度超过 800 华氏度（约 <strong>426.7 ℃</strong>），距离地球 <strong>2545 光年</strong>。</p>
+        <span class="kv"><b>结论：</b>它不是"第二个地球"，但证明了 AI 能在人类已经仔细分析过的数据里找出被忽视的微弱信号。</span>
+      </div>
+      <div class="card">
+        <div class="card-top"><span class="badge">📖</span><h4>为什么这件事影响深远</h4></div>
+        <p>2018 年 Google 将相关代码开源，推动整个社区用 AI 搜索系外行星。它同时也是"跨界合作"的范例：一位软件工程师 + 一位天文学家，用一套公开数据做出登上发现榜的成果。</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="case cn">
+    <div class="case-head"><h3>🇨🇳 中国团队：算法效率突破 + 宜居带超级地球</h3><span class="year">2024 / 2025 · 中国科学院</span></div>
+
+    <h4>① 中科院上海天文台 GPFC：首次让 AI 一次性完成"搜寻 + 识别"</h4>
+    <p>葛健研究员团队开发的 <strong>GPFC 算法</strong>由 GPU 相位折叠与 19 层卷积神经网络组成，是天文学家第一次用 AI <strong>同时完成疑似信号搜寻和真信号识别</strong>两项任务。难点在于真实凌星样本太少，团队根据凌星的物理特征<strong>生成了 200 万条人工合成光变曲线</strong>用来训练。</p>
+    <div class="metric-row">
+      <div class="metric"><b>快约 15 倍</b><span>对比国际流行的 BLS 法的搜寻速度</span></div>
+      <div class="metric"><b>各提高约 7%</b><span>检测准确度与完备度</span></div>
+      <div class="metric"><b>200 万条</b><span>用于训练的合成光变曲线</span></div>
+      <div class="metric"><b>5 颗</b><span>此前未被发现的超短周期行星</span></div>
+    </div>
+    <p>科学发现是 5 颗直径小于地球、轨道周期短于 1 天的超短周期行星：<code>Kepler-158d</code>、<code>Kepler-963c</code>、<code>Kepler-879c</code>、<code>Kepler-1489c</code>、<code>Kepler-2003b</code>，其中 <strong>4 颗是迄今发现的距主星最近的最小行星，大小类似火星</strong>。普林斯顿大学教授 Josh Winn 的评价是："我原以为开普勒数据已被挖掘殆尽，这项成就令人印象深刻。"</p>
+
+    <h4>② 中科院云南天文台：用 TTV 在类太阳恒星宜居带找到"超级地球"</h4>
+    <p>顾盛宏研究员领衔的国际团队 2025 年 6 月在《自然-天文学》发表成果，<strong>首次</strong>利用凌星中间时刻变化反演技术在类太阳恒星宜居带发现"超级地球" <strong>Kepler-725c</strong>：质量约为地球的 <strong>10 倍</strong>，公转周期 <strong>207.5 天</strong>，轨道半长轴 <strong>0.674 天文单位</strong>，接收平均辐照为地球的 <strong>1.4 倍</strong>，位于宜居带内。做法正是分析系统中另一颗行星 Kepler-725b 凌星时间的微小偏离，推断出这颗隐藏行星的存在。由于不需要轨道对齐、也不需要视向速度测量，它为探测宜居带内的非凌星行星开辟了新通道，并将为我国 CSST 巡天望远镜与 ET 地球 2.0 项目提供支持。</p>
+
+    <h4>③ 国内其他 AI 天文进展</h4>
+    <ul class="plain">
+      <li><strong>OneAstronomy 基础模型</strong>：之江实验室与中科院国家天文台研发，面向天文图像、光谱、时域数据和星表四类数据实现统一表征与知识发现。</li>
+      <li><strong>FLARE 耀发预测大模型</strong>：中科院自动化研究所联合国家天文台研发，准确率超 70%，可对恒星活动主动预警。</li>
+      <li><strong>星语 StarWhisper 大模型</strong>：已接入望远镜控制系统，能在虚拟环境中练习观测策略，推动天文台向 L5 级自主探索演进。</li>
+    </ul>
+  </article>
+</section>
+
+<!-- SECTION: datasets -->
+<section class="section wrap" id="datasets">
+  <div class="section-head">
+    <span class="kicker">04 · Data &amp; Tools</span>
+    <h2><span class="num">四</span>数据集与工具：高中生也能上场的开放科研基础设施</h2>
+    <p class="sub">这个领域的开放程度很高：数据和代码基本都是公开的，不需要向机构申请特殊权限就能拿到真实观测数据。</p>
+  </div>
+
+  <h3><span class="ico">🗄️</span>四大核心数据档案</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <caption>表 3 · 学界常用的核心公开数据平台</caption>
+      <thead><tr><th>数据平台</th><th>存放内容</th><th>访问入口</th></tr></thead>
+      <tbody>
+        <tr><td>NASA Exoplanet Archive</td><td>汇集所有已知系外行星及宿主恒星参数，提供超过 1.07 亿条光变曲线，含 KOI/TCE 目录、交互式表格、TAP 服务与 API</td><td><code>exoplanetarchive.ipac.caltech.edu</code></td></tr>
+        <tr><td>MAST（Mikulski Archive）</td><td>存储 Kepler / K2 / TESS 原始像素文件、光变曲线和数据验证报告</td><td><code>archive.stsci.edu</code></td></tr>
+        <tr><td>ExoFOP-TESS</td><td>TESS 兴趣目标社区平台，提供候选体优先级排序和社区注释</td><td><code>exofop.ipac.caltech.edu</code></td></tr>
+        <tr><td>NADC（国家天文科学数据中心）</td><td>中国天文数据服务平台，提供国内望远镜数据及国际合作数据访问</td><td><code>nadc.china-vo.org</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <p><b>四层怎么分工？</b>查某颗行星的质量、半径、轨道周期 → NASA 系外行星档案；要某个目标的原始像素或去噪后的光变曲线 → MAST；看某颗 TESS 候选体被社区判定的优先级和别人写的标注 → ExoFOP-TESS；取国内望远镜或国际合作数据 → 国家天文科学数据中心。档案里超过 1.07 亿条光变曲线可以用 TAP 服务和 API 通过脚本批量下载。</p>
+  </div>
+
+  <h3><span class="ico">🧰</span>常用开源工具与代码库</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <caption>表 4 · 八类常用开源工具</caption>
+      <thead><tr><th>工具</th><th>功能与特点</th><th>适用任务</th></tr></thead>
+      <tbody>
+        <tr><td>Lightkurve</td><td>Python 开源包，支持 Kepler / K2 / TESS 数据下载、检查、绘图和自定义管道构建，内置 BLS 算法，配套丰富教程</td><td>光变曲线分析与凌星信号检测</td></tr>
+        <tr><td>eleanor</td><td>从 TESS 全帧图像（FFI）提取光变曲线，执行背景扣除、孔径测光和系统学误差去相关</td><td>TESS 全帧图像处理</td></tr>
+        <tr><td>ExoMiner / ExoMiner++</td><td>NASA 开源深度学习分类器，用于 Kepler / TESS 候选信号的自动验证与排序</td><td>行星候选体真假分类</td></tr>
+        <tr><td>AstroNet</td><td>Google 开源的卷积神经网络系外行星分类器，曾用于发现 Kepler-90i</td><td>凌星信号识别</td></tr>
+        <tr><td>BLS（Box Least Squares）</td><td>Astropy 库实现的经典凌星信号检测算法，Lightkurve 内置调用接口</td><td>周期性凌星信号搜索</td></tr>
+        <tr><td>exoplanet</td><td>基于 PyMC3 的梯度推断工具，用于建模 TESS 光变曲线和轨道参数</td><td>行星参数拟合</td></tr>
+        <tr><td>LcTools</td><td>Windows 平台软件，支持 TESS / K2 / Kepler 光变曲线的可视化、信号检测和批量处理</td><td>公民科学与教学</td></tr>
+        <tr><td>RAVEN</td><td>华威大学开源的 TESS 候选体筛选验证流程，含合成训练数据集</td><td>TESS 候选体自动验证</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3><span class="ico">🚀</span>一条可复制的入门路径</h3>
+  <div class="flow">
+    <div class="step"><b>第 1 步</b>用 <code>Lightkurve</code> 下载某颗 TESS 目标的光变曲线并画出图</div>
+    <span class="arrow">→</span>
+    <div class="step"><b>第 2 步</b>跑 <code>BLS</code> 在曲线上找周期性下降的信号</div>
+    <span class="arrow">→</span>
+    <div class="step"><b>第 3 步</b>参考公开的 <code>AstroNet</code> / <code>ExoMiner</code> 代码训练自己的分类器</div>
+  </div>
+  <p>不想碰编程界面，可以用 <code>LcTools</code> 这类 Windows 图形软件直接做可视化和批量检测；需要训练数据时，<code>RAVEN</code> 附带合成训练数据集——这和 GPFC 用 200 万条合成光变曲线解决样本不足的思路完全一致。正如 NASA 科学家所说：<strong>"开源科学和开源软件是系外行星领域快速发展的原因。"</strong></p>
+</section>
+
+<!-- SECTION: challenges -->
+<section class="section wrap" id="challenges">
+  <div class="section-head">
+    <span class="kicker">05 · Challenges &amp; Outlook</span>
+    <h2><span class="num">五</span>挑战与展望：AI 天文学家还差哪几步</h2>
+    <p class="sub">AI 已经很有用，但它目前的位置是<strong>高效的辅助筛选与验证工具</strong>，还算不上独立发现者——下面五个瓶颈决定了这一点。</p>
+  </div>
+
+  <h3><span class="ico">⚠️</span>五个尚未解决的瓶颈</h3>
+  <ol class="num-list">
+    <li><b>假阳性与标签噪声。</b>TESS 数据中被判为假阳性的 1185 个目标数量超过了确认行星的 666 个；而训练用的标签本身也可能错，比如把食双星误标成行星，这会直接削弱模型的泛化能力。</li>
+    <li><b>样本稀少与类别失衡。</b>ExoMiner 训练集中真实行星样本只占 8.5%，在这种比例下模型天然偏向多数类。</li>
+    <li><b>可解释性不足。</b>即使 ExoMiner 引入了解释性框架，多数深度学习模型仍是"黑箱"，天文学家难以完全信任它的决策。</li>
+    <li><b>跨任务迁移困难。</b>Kepler、TESS、PLATO 在观测策略与噪声特性上差异巨大，换一台望远镜往往需要大量重新训练或适配。</li>
+    <li><b>过拟合风险。</b>复杂模型在小数据集上容易过拟合，必须精心设计正则化与数据增强策略。</li>
+  </ol>
+  <p>注意一个共同点：GPFC、ExoMiner、Kepler-90i 三项成果背后，都有<strong>人类设定搜索范围、设计特征、复核结论</strong>的环节。AI 干的是算力活，问题还是人提出的。</p>
+
+  <h3><span class="ico">🔭</span>三代望远镜，把 AI 推上必备位置</h3>
+  <div class="grid c3">
+    <div class="card">
+      <div class="card-top"><span class="badge">🇪🇺</span><h4>ESA PLATO</h4></div>
+      <p>计划 2026 年发射，将用 <strong>26 台相机</strong>搜索约 <strong>100 万颗恒星</strong>，聚焦宜居区岩石行星。</p>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge">🛰️</span><h4>NASA Roman</h4></div>
+      <p>预计捕获<strong>数万颗</strong>系外行星的凌星信号，数据规模再上一个量级。</p>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge">🇨🇳</span><h4>CSST 与 ET 地球 2.0</h4></div>
+      <p>中国巡天空间望远镜与系外地球巡天卫星同样会产出海量数据，TTV 等技术将为其提供支持。</p>
+    </div>
+  </div>
+  <p class="callout">面对 PB 级数据，<b>AI 是唯一的可行处理方案</b>——这不是"更好用"的问题，而是"不用它就没法做"的问题。</p>
+
+  <h3><span class="ico">🤖</span>从筛选工具到"自主科学家"</h3>
+  <div class="grid c3">
+    <div class="card">
+      <div class="card-top"><span class="badge">🧑‍🔬</span><h4>NASA AstroAgents</h4></div>
+      <p>由 <strong>8 个 AI 代理</strong>组成，能自主阅读文献、分析数据、生成假设并撰写论文。</p>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge">🗣️</span><h4>星语大模型</h4></div>
+      <p>已能控制望远镜<strong>自主规划观测</strong>，把天文台朝自主探索方向推进。</p>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge">📡</span><h4>AI 接管真实望远镜</h4></div>
+      <p>美国西北大学的 AI 调度系统已接管智利一台 <strong>4 米望远镜</strong>，决策能力可媲美人类。</p>
+    </div>
+  </div>
+
+  <h3><span class="ico">📈</span>四条技术趋势</h3>
+  <ul class="plain">
+    <li><strong>天文基础模型崛起。</strong>OneAstronomy 这类多模态模型把图像、光谱、时域与星表数据统一到一套表征中，实现跨任务、跨波段知识迁移；Transformer 架构已被用于直接处理全帧图像光变曲线，从中发现 <strong>214 个新候选体</strong>。</li>
+    <li><strong>混合架构支撑实时分诊。</strong>CNN + BiLSTM + 注意力机制的混合模型在 Kepler DR25 数据集上达到 <strong>F1 值 0.910</strong>，推理时间仅 <strong>80 毫秒／候选体</strong>，可服务 TESS 与 PLATO 的实时筛选。</li>
+    <li><strong>AI 加速理论模拟。</strong>Bern 大学的 AI 模型能在<strong>秒级</strong>预测整个行星系统的形成，比传统数值模拟快百万倍、准确率 <strong>99%</strong>，可用于筛选 PLATO 等任务的优先观测目标；物理信息神经网络（PINNs）被用于精确模拟系外行星大气中的光散射，提升 JWST 数据分析精度。</li>
+    <li><strong>智慧天文台体系化。</strong>中科院提出智慧天文台 5 级智能化体系，从 L1 辅助人工级到 L5 自主探索级，让天文台演进为集智能运行、分析、决策与自主发现于一体的平台。</li>
+  </ul>
+
+  <div class="callout">
+    <p>🎒 <b>对高中生的意义</b>：这个方向同时需要物理直觉、数据分析能力和编程实现，而入口极低——用 <code>Lightkurve</code> 读取 NASA 公开的 1.07 亿条光变曲线，再套用公开的 <code>AstroNet</code> 代码，就有机会在已被分析过的数据里寻找被忽视的信号。Kepler-90i 的故事正是这样开始的。未来的"第二个地球"，也许就藏在一段自己写的代码里。</p>
+  </div>
+</section>
+
+</main>
+
+<!-- SECTION: refs -->
+<footer class="refs" id="refs">
+  <div class="wrap">
+    <h2>📚 参考资料</h2>
+    <p class="ref-note">本页所有数据与结论均出自下列论文、机构公告与新闻报道，按类型分组。标注为"工具"的条目均为开源项目或官方数据平台，可直接访问试用。</p>
+
+    <div class="ref-group">
+      <h3>📄 论文与预印本</h3>
+      <ul class="ref-list">
+        <li><span class="t">ExoMiner: A Highly Accurate and Interpretable Classification of Exoplanet Transits in the Kepler Age</span> — <a href="https://ar5iv.labs.arxiv.org/html/2111.10009" target="_blank" rel="noopener">ar5iv.labs.arxiv.org/html/2111.10009</a> · <a href="http://ui.adsabs.harvard.edu/abs/2022ApJ...926..120V/abstract" target="_blank" rel="noopener">ADS 收录页</a></li>
+        <li><span class="t">ExoMiner++ on TESS with Transfer Learning</span> — <a href="https://arxiv.org/html/2502.09790v3" target="_blank" rel="noopener">arxiv.org/html/2502.09790v3</a></li>
+        <li><span class="t">Identifying Exoplanets with Deep Learning（混合架构 / F1=0.910）</span> — <a href="https://arxiv.org/abs/2509.04793?context=astro-ph" target="_blank" rel="noopener">arxiv.org/abs/2509.04793</a></li>
+        <li><span class="t">Detecting Earth-sized Planets in the Keplerusing Neural Networks（Kepler-90i 论文）</span> — <a href="https://research.google/blog/open-sourcing-the-hunt-for-exoplanets/" target="_blank" rel="noopener">research.google/blog（含开源说明）</a></li>
+        <li><span class="t">eleanor: An Open-source Tool for Extracting Light Curves from TESS Full-Frame Images</span> — <a href="https://www.ipac.caltech.edu/publication/2019PASP..131i4502F" target="_blank" rel="noopener">ipac.caltech.edu</a></li>
+        <li><span class="t">Lightkurve v1.0: Kepler, K2, and TESS Time Series Analysis in Python</span> — <a href="https://ui.adsabs.harvard.edu/abs/2019AAS...23344501D/abstract" target="_blank" rel="noopener">ADS 收录页</a></li>
+        <li><span class="t">Box Least Squares (BLS) Periodogram — Astropy 官方文档</span> — <a href="https://docs.astropy.org/en/stable/timeseries/bls.html" target="_blank" rel="noopener">docs.astropy.org</a></li>
+        <li><span class="t">Identifying transiting exoplanet signals — Lightkurve 官方教程</span> — <a href="https://lightkurve.github.io/lightkurve/tutorials/3-science-examples/exoplanets-identifying-transiting-planet-signals.html" target="_blank" rel="noopener">lightkurve.github.io</a></li>
+      </ul>
+    </div>
+
+    <div class="ref-group">
+      <h3>🗞️ 机构公告与新闻报道</h3>
+      <ul class="ref-list">
+        <li><span class="t">Artificial Intelligence and NASA Data Used to Discover Eighth Planet Circling Distant Star（NASA 官方）</span> — <a href="https://www.nasa.gov/news-release/artificial-intelligence-nasa-data-used-to-discover-eighth-planet-circling-distant-star/" target="_blank" rel="noopener">nasa.gov</a> · <a href="https://science.nasa.gov/open-science/deep-learning-exoplanets-tess/" target="_blank" rel="noopener">NASA：AI 模型验证数百颗行星</a></li>
+        <li><span class="t">NASA uses AI to uncover eighth planet circling distant star</span> — <a href="https://www.spacedaily.com/reports/NASA_uses_AI_to_uncover_eighth_planet_circling_distant_star_999.html" target="_blank" rel="noopener">spacedaily.com</a> · <a href="https://scitechdaily.com/astronomers-discover-eighth-planet-circling-kepler-90/" target="_blank" rel="noopener">scitechdaily.com</a></li>
+        <li><span class="t">Deep learning tool helps NASA discover exoplanets（ExoMiner 报道）</span> — <a href="https://www.pbs.org/wgbh/nova/article/exominer-neural-network-kepler-exoplanet-discovery/" target="_blank" rel="noopener">pbs.org / NOVA</a></li>
+        <li><span class="t">中国科学院利用人工智能，发现迄今最小、最接近主星的行星（上海天文台 GPFC）</span> — <a href="https://www.shao.ac.cn/lnpt/news/202410/t20241014_7399684.html" target="_blank" rel="noopener">shao.ac.cn</a> · <a href="https://www.cas.cn/cm/202410/t20241021_5036683.shtml" target="_blank" rel="noopener">cas.cn</a> · <a href="https://news.sciencenet.cn/htmlnews/2024/10/532073.shtm" target="_blank" rel="noopener">sciencenet.cn</a></li>
+        <li><span class="t">类太阳恒星宜居带发现"超级地球"Kepler-725c（云南天文台，Nature Astronomy）</span> — <a href="https://www.ynao.ac.cn/xwzx/cmsm/202506/t20250618_7871578.html" target="_blank" rel="noopener">ynao.ac.cn</a> · <a href="https://www.cas.cn/syky/202506/t20250604_5071669.shtml" target="_blank" rel="noopener">cas.cn</a> · <a href="https://www.ynao.cas.cn/xwzx/kyjz/202506/t20250602_7794879.html" target="_blank" rel="noopener">云南天文台公告</a></li>
+        <li><span class="t">AI 推动天文观测向"智慧天文台"演进（OneAstronomy / 星语 / 智慧天文台 5 级体系）</span> — <a href="https://www.cas.cn/cm/202608/t20260807_5117990.shtml" target="_blank" rel="noopener">cas.cn</a> · <a href="https://news.sciencenet.cn/sbhtmlnews/2026/9/391424.shtm" target="_blank" rel="noopener">科学网：AI 天文学家来了</a></li>
+        <li><span class="t">AI"助手"加入天文研究行列（NASA AstroAgents 多智能体系统）</span> — <a href="https://tech.cnr.cn/techyw/kan/20250511/t20250511_527165990.shtml" target="_blank" rel="noopener">央广网</a> · <a href="https://www.kepuchina.cn/article/articleinfo?ar_id=724613&amp;business_type=100&amp;classify=0" target="_blank" rel="noopener">科普中国：AI 调度系统接管望远镜</a></li>
+        <li><span class="t">AI Predicts Hidden Exoplanets and Accelerates Planetary Formation Simulations（Bern 大学）</span> — <a href="https://completeaitraining.com/news/ai-predicts-hidden-exoplanets-and-accelerates-planetary/" target="_blank" rel="noopener">completeaitraining.com</a> · <a href="https://www.lmu.de/en/newsroom/news-overview/news/astrophysics-ai-shines-a-new-light-on-exoplanets-ccdd4c37.html" target="_blank" rel="noopener">LMU：AI 与系外行星大气</a></li>
+        <li><span class="t">Tag: PLATO（柏拉图望远镜 26 台相机、监测约 100 万颗恒星）</span> — <a href="https://giznewsdaily.com/tag/plato/" target="_blank" rel="noopener">giznewsdaily.com</a> · <a href="https://bkso.baidu.com/item/%E6%9F%8F%E6%8B%89%E5%9B%BE%E5%A4%AA%E7%A9%BA%E6%9C%9B%E8%BF%9C%E9%95%9C/13033801" target="_blank" rel="noopener">柏拉图太空望远镜词条</a></li>
+        <li><span class="t">寻找系外行星无异于大海捞针？（凌星法与径向速度法科普）</span> — <a href="https://www.kepuchina.cn/article/articleinfo?ar_id=706955&amp;business_type=100&amp;classify=0" target="_blank" rel="noopener">科普中国</a> · <a href="http://baike.baidu.com/view/4421762.htm" target="_blank" rel="noopener">行星凌星法词条</a> · <a href="https://www.kepuchina.cn/qykj/hkht/201712/t20171221_343978.shtml" target="_blank" rel="noopener">人工智能出鞘 "剑"指系外行星</a></li>
+        <li><span class="t">AI 发现 118 颗新系外行星，华威大学 RAVEN 流程</span> — <a href="https://36kr.com/p/3746567250477833" target="_blank" rel="noopener">36kr.com</a></li>
+        <li><span class="t">科学数据哪里去挖？天文数据开放共享调查（含 NASA 档案 1.07 亿条光变曲线）</span> — <a href="https://nadc.china-vo.org/article/20240219141558" target="_blank" rel="noopener">nadc.china-vo.org</a></li>
+      </ul>
+    </div>
+
+    <div class="ref-group">
+      <h3>🛠️ 开源项目与数据平台</h3>
+      <ul class="ref-list">
+        <li><span class="t">nasa/ExoMiner — NASA 官方开源仓库</span> — <a href="https://github.com/nasa/Exominer" target="_blank" rel="noopener">github.com/nasa/Exominer</a></li>
+        <li><span class="t">pearsonkyle/Exoplanet-Artificial-Intelligence — AstroNet 复现仓库</span> — <a href="https://github.com/pearsonkyle/Exoplanet-Artificial-Intelligence" target="_blank" rel="noopener">github.com</a></li>
+        <li><span class="t">spacetelescope/tessworkshop_tutorials — 太空望远镜科学研究所教程</span> — <a href="https://github.com/spacetelescope/tessworkshop_tutorials" target="_blank" rel="noopener">github.com</a></li>
+        <li><span class="t">NASA Exoplanet Archive</span> — <a href="https://exoplanetarchive.ipac.caltech.edu" target="_blank" rel="noopener">exoplanetarchive.ipac.caltech.edu</a></li>
+        <li><span class="t">MAST / Mikulski Archive for Space Telescopes</span> — <a href="https://archive.stsci.edu" target="_blank" rel="noopener">archive.stsci.edu</a> · <a href="https://archive.stsci.edu/contents/newsletters/october-2020/keplerk2-notebook-tutorial-collection" target="_blank" rel="noopener">Kepler/K2 教程合集</a></li>
+        <li><span class="t">ExoFOP-TESS 社区平台</span> — <a href="https://exofop.ipac.caltech.edu" target="_blank" rel="noopener">exofop.ipac.caltech.edu</a></li>
+        <li><span class="t">国家天文科学数据中心 NADC</span> — <a href="https://nadc.china-vo.org" target="_blank" rel="noopener">nadc.china-vo.org</a> · <a href="https://www.bao.ac.cn/gtc/hrs/kxmbsciencecases/" target="_blank" rel="noopener">郭守敬望远镜科学目标</a></li>
+      </ul>
+    </div>
+
+    <div class="colophon">
+      <p>本网站为 AI 实验课作业成果：内容由调研报告整理而来，采用纯 HTML + CSS 单文件实现，无 JavaScript、无外部依赖，可直接用浏览器打开。</p>
+      <p>配色为浅色学术主题 + 深空 Hero；正文中的示意图由内联 SVG 绘制，页面不含 JavaScript。<a href="#top">↑ 返回顶部</a></p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
