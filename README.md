@@ -4,7 +4,7 @@ This project uses a web page to introduce how artificial intelligence helps scie
 
 ## Team Members
 - Name: Zhang Jiaming
-- GitHub username: zjm_xxxx
+- GitHub username: LittleTiger-zjm
 
 ## Current Progress
 Finished the main HTML web page. The page introduces the basic idea of using AI to search for habitable exoplanets.
